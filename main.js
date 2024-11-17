@@ -2,14 +2,6 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase
 import { getAuth, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js';
 import { getFirestore, doc, collection, addDoc, setDoc, getDocs   } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAPwFQsM5H9GNe1nEB4Xgx86h3zYOG7_r8",
-  authDomain: "groupprojecttest12331.firebaseapp.com",
-  projectId: "groupprojecttest12331",
-  storageBucket: "groupprojecttest12331.firebasestorage.app",
-  messagingSenderId: "117617683043",
-  appId: "1:117617683043:web:3efe98987e6d5a453e2656"
-};
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth();
