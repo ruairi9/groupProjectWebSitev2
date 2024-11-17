@@ -1,10 +1,15 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
 import { getAuth, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js';
-import { getFirestore, doc, collection, addDoc, setDoc  } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
+import { getFirestore, doc, collection, addDoc, setDoc, getDocs   } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
 
-
-
-
+const firebaseConfig = {
+  apiKey: "AIzaSyAPwFQsM5H9GNe1nEB4Xgx86h3zYOG7_r8",
+  authDomain: "groupprojecttest12331.firebaseapp.com",
+  projectId: "groupprojecttest12331",
+  storageBucket: "groupprojecttest12331.firebasestorage.app",
+  messagingSenderId: "117617683043",
+  appId: "1:117617683043:web:3efe98987e6d5a453e2656"
+};
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth();
@@ -16,8 +21,6 @@ const openPopup = document.getElementById('openPopup');
 const closePopup = document.getElementById('closePopup');
 const toLogin = document.getElementById('loginGoogle');
 const statusMessage = document.getElementById('statusMessage');
-
-
 
 if (openPopup) {
   openPopup.onclick = function() {
@@ -36,7 +39,6 @@ if (toLogin) {
   toLogin.onclick = async function() {
     statusMessage.style.display = 'block';
     statusMessage.textContent = 'Attempting to log in';
-
     await signInWithPopup(auth, provider).then(() => {
       window.location.href = 'mainwebpage.html';
     });
@@ -54,7 +56,6 @@ const loginForm = document.getElementById('loginForm');
 if (loginForm) {
   loginForm.addEventListener('submit', (event) => {
     event.preventDefault();
-
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
 
@@ -70,7 +71,6 @@ if (loginForm) {
       });
   });
 }
-
 
 const registerForm = document.getElementById('register-form');
 if (registerForm) {
@@ -88,7 +88,6 @@ function registerUser(event) {
     .then((userCredential) => {
       const user = userCredential.user;
       console.log("User registered", user);
-
       alert("User has registered successfully");
       window.location.href = "mainwebpage.html";
     })
@@ -102,35 +101,85 @@ function registerUser(event) {
     });
 }
 
-const managerForm = document.getElementById('managerform');
-if (managerForm) {
-    managerForm.addEventListener('submit', addClient); 
-}
+document.addEventListener('DOMContentLoaded', () => {
+  const managerForm = document.getElementById('managerform');
+  if (managerForm) {
+    managerForm.addEventListener('submit', async (e) => {
+      e.preventDefault(); 
 
-managerForm.addEventListener('submit', async (e) => {
-  e.preventDefault(); 
+      const user = auth.currentUser;
+      if (!user) {
+        alert("You must be logged in to add clients");
+        return;
+      }
+      const companyName = document.getElementById('managercompanies').value;
+      const contactNumber = document.getElementById('contactnumber').value;
 
-  const companyName = document.getElementById('managercompanies').value;
-  const contactNumber = document.getElementById('contactnumber').value;
-  //const contactEmail = document.getElementById('contactemail').value;
+      try {
+        const clientRef = collection(db, 'clients');
+        await addDoc(clientRef, {
+            managercompanies: companyName,
+            contactnumber: contactNumber,
+            userId: user.uid,
+        });
 
-  try {
-      const clientRef = collection(db, 'clients');
-
-      await addDoc(clientRef, {
-          managercompanies: companyName,
-          contactnumber: contactNumber,
-         // contactemail: contactEmail,
-          //createdAt: new Date().toISOString() 
-      });
-
-      console.log("Client added successfully");
-      statusMessage.textContent = "Client added successfully";
-      statusMessage.style.display = 'block';
-      managerForm.reset(); 
-  } catch (error) {
-      console.error("Error adding client", error);
-      statusMessage.textContent = "Error adding client. Please try again";
-      statusMessage.style.display = 'block';
+        console.log("Client added successfully");
+        statusMessage.textContent = "Client added successfully";
+        statusMessage.style.display = 'block';
+        managerForm.reset(); 
+      } catch (error) {
+        console.error("Error adding client", error);
+        statusMessage.textContent = "Error adding client. Please try again";
+        statusMessage.style.display = 'block';
+      }
+    });
   }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const clientsContainer = document.getElementById('clients-container');
+
+  if (!clientsContainer) {
+    console.error('clients-container not found in the DOM');
+    return;
+  }
+
+  async function fetchClients(user) {
+    try {
+      if (!user) {
+        clientsContainer.innerHTML = '<p>Please log in to view your clients.</p>';
+        return;
+      }
+
+      const clientsRef = collection(db, 'clients');
+      const querySnapshot = await getDocs(clientsRef);
+
+      clientsContainer.innerHTML = '';
+
+      querySnapshot.forEach((doc) => {
+        const client = doc.data();
+
+        if (client.userId === user.uid) {
+          const clientElement = document.createElement('div');
+          clientElement.classList.add('client-card');
+          clientElement.innerHTML = `
+            <h3>${client.managercompanies}</h3>
+            <p><strong>Contact Number:</strong> ${client.contactnumber}</p>
+          `;
+          clientsContainer.appendChild(clientElement);
+        }
+      });
+    } catch (error) {
+      console.error("Error fetching clients:", error);
+      clientsContainer.innerHTML = '<p>Error loading clients. Please try again later.</p>';
+    }
+  }
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      fetchClients(user);
+    } else {
+      clientsContainer.innerHTML = '<p>Please log in to view your clients.</p>';
+    }
+  });
 });
