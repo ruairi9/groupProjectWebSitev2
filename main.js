@@ -3,6 +3,7 @@ import { getAuth, signInWithPopup, createUserWithEmailAndPassword, signInWithEma
 import { getFirestore, doc, collection, addDoc, setDoc, getDocs   } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
 
 
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth();
 const db = getFirestore(app);  
@@ -166,6 +167,35 @@ document.addEventListener('DOMContentLoaded', () => {
       clientsContainer.innerHTML = '<p>Error loading clients. Please try again later.</p>';
     }
   }
+
+  async function fetchPredictions() {
+    if (!predictionsContainer) return;
+  
+    try {
+      const predictions = [
+        { type: 'Stock', name: 'Apple', predictedPrice: 180 },
+        { type: 'Stock', name: 'Microsoft', predictedPrice: 310 },
+        { type: 'Crypto', name: 'Bitcoin', predictedPrice: 50000 },
+        { type: 'Crypto', name: 'Ethereum', predictedPrice: 4000 }
+      ];
+  
+      predictionsContainer.innerHTML = '';
+      predictions.forEach((prediction) => {
+        const predictionElement = document.createElement('div');
+        predictionElement.classList.add('prediction-card');
+        predictionElement.innerHTML = `
+          <h3>${prediction.name}</h3>
+          <p><strong>Predicted Price:</strong> $${prediction.predictedPrice}</p>
+          <p><strong>Type:</strong> ${prediction.type}</p>
+        `;
+        predictionsContainer.appendChild(predictionElement);
+      });
+    } catch (error) {
+      console.error("Error fetching predictions:", error.message);
+      predictionsContainer.innerHTML = '<p>Error loading predictions. Please try again later.</p>';
+    }
+  }
+  
 
   onAuthStateChanged(auth, (user) => {
     if (user) {
