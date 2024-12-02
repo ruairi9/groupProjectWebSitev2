@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Asset Purchase</title>
+  <link rel="stylesheet" href="cssCode.css">
+</head>
+<body>
+  <form id="purchaseForm">
+    <label for="clientSelect">Select Client:</label>
+    <select id="clientSelect">
+      <option value="">Select a client</option>
+    </select>
+
+    <label for="assetType">Asset Type:</label>
+    <select id="assetType">
+      <option value="">Select asset type</option>
+      <option value="stocks">Stocks</option>
+      <option value="crypto">Crypto</option>
+    </select>
+
+    <label for="assetName">Asset Name:</label>
+    <select id="assetName">
+      <optgroup label="Stocks" class="stock-options">
+        <option data-price="450.0">NVIDIA</option>
+        <option data-price="230.0">Android</option>
+        <option data-price="320.0">Apple</option>
+        <option data-price="280.0">Microsoft</option>
+        <option data-price="340.0">Amazon</option>
+        <option data-price="400.0">Tesla</option>
+        <option data-price="290.0">Alphabet (Google)</option>
+        <option data-price="300.0">Meta Platforms</option>
+        <option data-price="350.0">Broadcom</option>
+        <option data-price="270.0">AMD</option>
+      </optgroup>
+
+      <optgroup label="Crypto" class="crypto-options">
+        <option data-price="28000.0">Bitcoin</option>
+        <option data-price="1800.0">Ethereum</option>
+        <option data-price="25.0">Solana</option>
+      </optgroup>
+    </select>
+
+    <label for="assetPrice">Asset Price (€):</label>
+    <input type="number" id="assetPrice" placeholder="Price will auto-fill" readonly required>
+
+    <label for="assetQuantity">Quantity:</label>
+    <input type="number" id="assetQuantity" placeholder="Enter quantity" required>
+
+    <button type="submit">Purchase</button>
+  </form>
+  <p id="purchaseStatus"></p>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
