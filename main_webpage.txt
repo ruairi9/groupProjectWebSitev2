@@ -3,16 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Login with Firebase v10</title>
-  
+    <title>Fund Manager Portal</title>
+    <link rel="stylesheet" href="cssCode.css">
 </head>
 <body>
 
-    <h1>main page</h1>
-    
-    <p>Already have an account? <a href="login.html">Login here</a></p>
-    <p>Don't have an account? <a href="registration.html">Register here</a></p>
+    <div class="container">
+        <header>
+            <h1>Fund Manager Portal</h1>
+            <p class="tagline">Management Dashboard</p>
+        </header>
+        
+        
+        <p>add a client <a href="addclients.html" class="btn-primary">add client</a></p>
+        <p>add a client transaction <a href="purchase.html" class="btn-primary">purchase asset</a></p>
+        <p>see your client<a href="seeclients.html" class="btn-primary">add transaction</a></p>
+        <p>predicted price<a href="predictedprices.html" class="btn-primary">see predicted price</a></p>
+        </div>
 
-    <script type="module" src="index.js"></script>
+    <script type="module" src="main.js"></script>
 </body>
 </html>
