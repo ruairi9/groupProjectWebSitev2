@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>reviews</title>
+</head>
+<body>
+    <form id="reviewsForm">
+        <h2>Leave a Review</h2>
+        <div class="form-group">
+            <label for="rating">Rating (1 to 5)</label>
+            <select id="rating" name="rating" required>
+                <option value="">Select a rating</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+        </div>
+        <div class="reviews-reviews">
+            <label for="reviews">Review</label>
+            <textarea id="reviews" name="reviews" required placeholder="Write your review"></textarea>
+        </div>
+        <button type="submit">Send Review</button>
+    </form>
+    <script type="module" src="main.js"></script>
+</body>
+</html>
