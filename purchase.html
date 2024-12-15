@@ -3,23 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Asset Purchase</title>
+  <title>Asset Purchase with PayPal</title>
   <link rel="stylesheet" href="cssCode.css">
-</head>
+  <script src="https://www.paypal.com/sdk/js?client-id=AY1d0u_iESDdYU33W_iyojkoT_4hOYppjjhtmBDgeNymLJRwm8MZZOF9i3R90HNtzXqoLszOiIwuS12c&components=buttons"></script></head>
 <body>
   <form id="purchaseForm">
     <label for="clientSelect">Select Client:</label>
     <select id="clientSelect">
       <option value="">Select a client</option>
     </select>
-
     <label for="assetType">Asset Type:</label>
     <select id="assetType">
       <option value="">Select asset type</option>
       <option value="stocks">Stocks</option>
       <option value="crypto">Crypto</option>
     </select>
-
     <label for="assetName">Asset Name:</label>
     <select id="assetName">
       <optgroup label="Stocks" class="stock-options">
@@ -34,24 +32,19 @@
         <option data-price="350.0">Broadcom</option>
         <option data-price="270.0">AMD</option>
       </optgroup>
-
       <optgroup label="Crypto" class="crypto-options">
         <option data-price="28000.0">Bitcoin</option>
         <option data-price="1800.0">Ethereum</option>
         <option data-price="25.0">Solana</option>
       </optgroup>
     </select>
-
     <label for="assetPrice">Asset Price (€):</label>
     <input type="number" id="assetPrice" placeholder="Price will auto-fill" readonly required>
-
     <label for="assetQuantity">Quantity:</label>
     <input type="number" id="assetQuantity" placeholder="Enter quantity" required>
-
-    <button type="submit">Purchase</button>
   </form>
+  <div id="paypal-button-container"></div>
   <p id="purchaseStatus"></p>
-
   <script type="module" src="main.js"></script>
 </body>
 </html>

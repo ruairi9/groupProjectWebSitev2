@@ -1,6 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
 import { getAuth, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js';
-import { getFirestore, doc, collection, addDoc, setDoc, getDocs, updateDoc, arrayUnion   } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
+import { getFirestore, doc, collection, addDoc, setDoc, getDocs, getDoc, updateDoc, arrayUnion   } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAPwFQsM5H9GNe1nEB4Xgx86h3zYOG7_r8",
@@ -22,7 +22,6 @@ const closePopup = document.getElementById('closePopup');
 const toLogin = document.getElementById('loginGoogle');
 const statusMessage = document.getElementById('statusMessage');
 
-const apiUrl = 'https://kangaroo-pleased-notably.ngrok-free.app/stock=';
 const stocks = {
   "nvda": 700,
   "andr": 500,
@@ -104,7 +103,7 @@ function registerUser(event) {
   const email = document.getElementById('loginEmailRegister').value;
   const password = document.getElementById('userPasswordRegister').value;
 
-  createUserWithEmailAndPassword(auth, email, password)
+  createUserWithEmailAndPassword(auth, email, password, name)
     .then((userCredential) => {
       const user = userCredential.user;
       console.log("User registered", user);
@@ -199,7 +198,7 @@ if (clientsContainer) {
 }
 
 
-//uikkkkkkkkkkkkk
+//purchase
 const purchaseForm = document.getElementById('purchaseForm');
 const clientSelect = document.getElementById('clientSelect');
 const purchaseStatus = document.getElementById('purchaseStatus');
@@ -207,168 +206,240 @@ const assetNameSelect = document.getElementById('assetName');
 const assetPriceInput = document.getElementById('assetPrice');
 const assetTypeSelect = document.getElementById('assetType');
 
-function updateAssetOptions() {
-  const assetType = assetTypeSelect.value;
-  assetNameSelect.innerHTML = '';
+if (purchaseForm) {
+    function updateAssetOptions() {
+        const assetType = assetTypeSelect.value;
+        assetNameSelect.innerHTML = '';
 
-  let options = [];
+        let options = [];
 
-  if (assetType === 'stocks') {
-    options = Object.keys(stocks);
-  } else if (assetType === 'crypto') {
-    options = Object.keys(crypto);
-  }
+        if (assetType === 'stocks') {
+            options = Object.keys(stocks);
+        } else if (assetType === 'crypto') {
+            options = Object.keys(crypto);
+        }
 
-  options.forEach(asset => {
-    const option = document.createElement('option');
-    option.value = asset;
-    option.textContent = asset;
-    option.setAttribute('data-price', assetType === 'stocks' ? stocks[asset] : crypto[asset]);
-    assetNameSelect.appendChild(option);
-  });
+        options.forEach(asset => {
+            const option = document.createElement('option');
+            option.value = asset;
+            option.textContent = asset;
+            option.setAttribute('data-price', assetType === 'stocks' ? stocks[asset] : crypto[asset]);
+            assetNameSelect.appendChild(option);
+        });
 
-  if (options.length > 0) {
-    assetPriceInput.value = assetNameSelect.options[0].getAttribute('data-price');
-  }
-}
-if (assetNameSelect) {
-  assetNameSelect.addEventListener('change', () => {
-    const selectedOption = assetNameSelect.options[assetNameSelect.selectedIndex];
-    const price = selectedOption.getAttribute('data-price');
-    assetPriceInput.value = price ? parseFloat(price).toFixed(2) : '';
-  });
-  }
-
-assetTypeSelect.addEventListener('change', updateAssetOptions);
-
-updateAssetOptions();
-
-async function fetchClientsForManager(user) {
-  try {
-    const clientsRef = collection(db, 'clients');
-    const querySnapshot = await getDocs(clientsRef);
-
-    clientSelect.innerHTML = '<option value="">Select a client</option>';
-
-    querySnapshot.forEach((doc) => {
-      const client = doc.data();
-      if (client.userId === user.uid) {
-        const option = document.createElement('option');
-        option.value = doc.id;
-        option.textContent = client.managercompanies;
-        clientSelect.appendChild(option);
-      }
-    });
-  } catch (error) {
-    console.error("Error fetching clients:", error);
-    purchaseStatus.textContent = "Error loading clients. Please try again later.";
-    purchaseStatus.style.color = 'red';
-  }
-}
-
-async function addAssetToClient(clientId, assetType, assetName, assetPrice, assetQuantity) {
-  try {
-    const clientRef = doc(db, 'clients', clientId);
-
-    const assetString = `${assetName},${assetPrice},${assetQuantity}`;
-
-    const updateData = {};
-    if (assetType === 'crypto') {
-      updateData.crypto = arrayUnion(assetString);
-    } else if (assetType === 'stocks') {
-      updateData.stocks = arrayUnion(assetString);
+        if (options.length > 0) {
+            assetPriceInput.value = assetNameSelect.options[0].getAttribute('data-price');
+        }
     }
 
-    await updateDoc(clientRef, updateData);
+    if (assetNameSelect) {
+        assetNameSelect.addEventListener('change', () => {
+            const selectedOption = assetNameSelect.options[assetNameSelect.selectedIndex];
+            const price = selectedOption.getAttribute('data-price');
+            assetPriceInput.value = price ? parseFloat(price).toFixed(2) : '';
+        });
+    }
 
-    return "Asset added successfully!";
-  } catch (error) {
-    console.error("Error adding asset:", error);
-    throw new Error("Failed to add asset. Please try again.");
+    assetTypeSelect.addEventListener('change', updateAssetOptions);
+    updateAssetOptions();
+
+    async function fetchClientsForManager(user) {
+        try {
+            const clientsRef = collection(db, 'clients');
+            const querySnapshot = await getDocs(clientsRef);
+
+            clientSelect.innerHTML = '<option value="">Select a client</option>';
+
+            querySnapshot.forEach((doc) => {
+                const client = doc.data();
+                if (client.userId === user.uid) {
+                    const option = document.createElement('option');
+                    option.value = doc.id;
+                    option.textContent = client.managercompanies;
+                    clientSelect.appendChild(option);
+                }
+            });
+        } catch (error) {
+            console.error("Error fetching clients:", error);
+            purchaseStatus.textContent = "Error loading clients. Please try again later.";
+            purchaseStatus.style.color = 'red';
+        }
+    }
+
+    async function addAssetToClient(clientId, assetType, assetName, assetPrice, assetQuantity) {
+      try {
+          const clientRef = doc(db, 'clients', clientId);
+          const clientSnap = await getDoc(clientRef);
+
+          if (!clientSnap.exists()) {
+              throw new Error("Client does not exist.");
+          }
+
+          const clientData = clientSnap.data();
+          const assets = clientData[assetType] || [];
+
+          let assetExists = false;
+
+          const updatedAssets = assets.map((asset) => {
+              const [name, price, quantity] = asset.split(',');
+              if (name === assetName) {
+                  assetExists = true;
+                  const newQuantity = parseInt(quantity, 10) + assetQuantity;
+                  return `${name},${price},${newQuantity}`;
+              }
+              return asset;
+          });
+
+          if (!assetExists) {
+              updatedAssets.push(`${assetName},${assetPrice},${assetQuantity}`);
+          }
+
+          const updateData = {
+              [assetType]: updatedAssets
+          };
+
+          await updateDoc(clientRef, updateData);
+          return "Asset added successfully!";
+      } catch (error) {
+          console.error("Error adding asset:", error);
+          throw new Error("Failed to add asset. Please try again.");
+      }
   }
+
+    paypal.Buttons({
+        createOrder: (data, actions) => {
+            const assetPrice = parseFloat(assetPriceInput.value);
+            const assetQuantity = parseInt(document.getElementById('assetQuantity').value, 10);
+
+            if (isNaN(assetPrice) || isNaN(assetQuantity) || assetQuantity <= 0) {
+                throw new Error("Invalid asset price or quantity.");
+            }
+
+            const totalAmount = (assetPrice * assetQuantity).toFixed(2);
+
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: totalAmount,
+                    }
+                }]
+            });
+        },
+
+        onApprove: (data, actions) => {
+            return actions.order.capture().then((details) => {
+                const payerName = details.payer.name.given_name;
+                purchaseStatus.textContent = `Payment successful! Thank you, ${payerName}.`;
+                purchaseStatus.style.color = 'green';
+
+                const clientId = clientSelect.value;
+                const assetType = document.getElementById('assetType').value;
+                const assetName = document.getElementById('assetName').value;
+                const assetPrice = parseFloat(document.getElementById('assetPrice').value);
+                const assetQuantity = parseInt(document.getElementById('assetQuantity').value, 10);
+
+                if (clientId && assetType && assetName && !isNaN(assetPrice) && !isNaN(assetQuantity)) {
+                    addAssetToClient(clientId, assetType, assetName, assetPrice, assetQuantity)
+                        .then((message) => {
+                            purchaseStatus.textContent += ` ${message}`;
+                            purchaseForm.reset();
+                        })
+                        .catch((error) => {
+                            console.error("Error updating client assets:", error);
+                            purchaseStatus.textContent += " However, we encountered an error updating client assets.";
+                        });
+                }
+            });
+        },
+
+        onError: (err) => {
+            console.error('PayPal Error:', err);
+            purchaseStatus.textContent = "Invalid asset price or quantity";
+            purchaseStatus.style.color = 'red';
+        }
+    }).render('#paypal-button-container');
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            fetchClientsForManager(user);
+        } else {
+            clientSelect.innerHTML = '<option value="">Please log in to view clients</option>';
+        }
+    });
 }
 
-purchaseForm.addEventListener('submit', async (event) => {
-  event.preventDefault();
 
-  const clientId = clientSelect.value;
-  const assetType = document.getElementById('assetType').value;
-  const assetName = document.getElementById('assetName').value;
-  const assetPrice = parseFloat(document.getElementById('assetPrice').value);
-  const assetQuantity = parseInt(document.getElementById('assetQuantity').value, 10);
+//view predicted future prices 
 
-  if (!clientId) {
-    purchaseStatus.textContent = "Please select a client.";
-    purchaseStatus.style.color = 'red';
-    return;
-  }
-
-  try {
-    const message = await addAssetToClient(clientId, assetType, assetName, assetPrice, assetQuantity);
-    purchaseStatus.textContent = message;
-    purchaseStatus.style.color = 'green';
-    purchaseForm.reset();
-  } catch (error) {
-    purchaseStatus.textContent = error.message;
-    purchaseStatus.style.color = 'red';
-  }
-});
-
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    fetchClientsForManager(user);
-  } else {
-    clientSelect.innerHTML = '<option value="">Please log in to view clients</option>';
-  }
-});
+/*
 
 
-//nrnj
 
-const displayClientData = async (userId) => {
-  const clientContainer = document.getElementById("clientData");
+*/
 
-  try {
-    const clientsSnapshot = await db.collection('clients')
-      .where('userId', '==', userId)
-      .get();
 
-    clientsSnapshot.forEach(async (doc) => {
-      const clientData = doc.data();
 
-      const clientDiv = document.createElement('div');
-      clientDiv.classList.add('client');
-      clientDiv.innerHTML = `<h3>Client: ${doc.id}</h3>`;
 
-      const cryptoAssets = clientData.crypto;
-      const stocks = clientData.stocks;
+//support from
+const supportForm = document.getElementById('contactform');
+if (supportForm) {
+  supportForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-      let cryptoHtml = '<h4>Cryptocurrencies:</h4><ul>';
-      for (const asset of cryptoAssets) {
-        const [symbol, price] = asset.split(',');
-        const prediction = await getPrediction(symbol);
-        cryptoHtml += `<li>${symbol} - Price: $${price}, Prediction: ${prediction}</li>`;
+    const subject = document.getElementById('subject').value;
+    const message = document.getElementById('message').value;
+    const user = auth.currentUser;
+    if (!user) {
+      alert("You must be logged in to submit a for this page");
+      return;
+    }
+    if (subject && message) {
+      try {
+        await addDoc(collection(db, "customersupport"), {
+          subject: subject,
+          message: message,
+          userid: user.uid
+        });
+        alert('your form submitted successfully!');
+        supportForm.reset();
+      } catch (error) {
+        console.error("Error adding document: ", error);
+        alert('Failed to submit form');
       }
-      cryptoHtml += '</ul>';
-      clientDiv.innerHTML += cryptoHtml;
+    } else {
+      alert('Please fill in all fields.');
+    }
+  });
+}
 
-      let stocksHtml = '<h4>Stocks:</h4><ul>';
-      for (const asset of stocks) {
-        const [symbol, price] = asset.split(',');
-        const prediction = await getPrediction(symbol);
-        stocksHtml += `<li>${symbol} - Price: $${price}, Prediction: ${prediction}</li>`;
+//review sForm
+const reviewsForm = document.getElementById('reviewsForm');
+if (reviewsForm) {
+  reviewsForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const rating = document.getElementById('rating').value;
+    const reviewText = document.getElementById('reviews').value;
+
+    if (rating && reviewText) {
+      try {
+        await addDoc(collection(db, "reviews"), {
+          rating: rating,
+          review: reviewText
+        });
+        alert('Review submitted successfully!');
+        reviewsForm.reset();
+      } catch (error) {
+        console.error("Error adding document: ", error);
+        alert('Failed to submit review');
       }
-      stocksHtml += '</ul>';
-      clientDiv.innerHTML += stocksHtml;
+    } else {
+      alert('Please fill in all fields.');
+    }
+  });
+}
 
-      clientContainer.appendChild(clientDiv);
-    });
-  } catch (error) {
-    console.error('Error retrieving client data: ', error);
-  }
-};
+//prices alert
 
-document.addEventListener("DOMContentLoaded", () => {
-  const userId = "PB4FuxRYqTga80ydxYDggz6iGEt1";
-  displayClientData(userId);
-});
+/*
+*/
