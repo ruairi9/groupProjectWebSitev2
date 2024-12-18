@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="cssCode.css">
+  <title>Asset Purchase</title>
+</head>
+<body>
+
+    <label for="stockName">Stock Name:</label>
+    <select id="stockName">
+      <option value="">Select a stock</option>
+      <option value="NVIDIA">NVIDIA</option>
+      <option value="Android">Android</option>
+      <option value="Apple">Apple</option>
+      <option value="Microsoft">Microsoft</option>
+      <option value="Amazon">Amazon</option>
+      <option value="Tesla">Tesla</option>
+      <option value="Alphabet">Alphabet (Google)</option>
+      <option value="Meta Platforms">Meta Platforms</option>
+      <option value="Broadcom">Broadcom</option>
+      <option value="AMD">AMD</option>
+    </select>
+
+    <div id="stockInfo"></div>
+
+    <label for="cryptoName">Crypto Name:</label>
+    <select id="cryptoName">
+      <option value="">Select a cryptocurrency</option>
+      <option value="Bitcoin">Bitcoin</option>
+      <option value="Ethereum">Ethereum</option>
+      <option value="Solana">Solana</option>
+    </select>
+
+    <div id="cryptoInfo"></div>
+
+    <h2>you will receive a notification if any of your clients assets change price</h2>
+  <script type="module" src="main.js"></script>
+</body>
+</html>
